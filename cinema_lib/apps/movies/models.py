@@ -1,5 +1,8 @@
 from django.db import models
+from django.urls import reverse
+
 from datetime import date
+
 
 
 
@@ -24,7 +27,7 @@ class DirectorActor(models.Model):
     name = models.CharField("Имя", max_length=30)
     age = models.SmallIntegerField("Возраст", default=0)
     description = models.TextField("Описание")
-    image = models.ImageField("Изображение", upload_to="actors/")
+    image = models.ImageField("Изображение", upload_to="actors/", blank=True)
 
     def __str__(self):
         return self.name
@@ -56,9 +59,9 @@ class Movie(models.Model):
     poster = models.ImageField("Постер", upload_to='movies/')
     year = models.DateField("Дата выхода", default=2021)
     country = models.CharField("Страна", max_length=30)
-    directors= models.ManyToManyField(DirectorActor, verbose_name="Режиссер", related_name="film_director")
+    directors = models.ManyToManyField(DirectorActor, verbose_name="Режиссер", related_name="film_director")
     actors = models.ManyToManyField(DirectorActor, verbose_name="Актеры", related_name="film_actor")
-    genre = models.ManyToManyField(Genre, verbose_name="Жанры")
+    genres = models.ManyToManyField(Genre, verbose_name="Жанры")
     premiere = models.CharField("Премьера", max_length=30, default=date.today)
     budget = models.PositiveIntegerField("Бюджет", help_text="Сумма в $")
     fees_in_usa = models.PositiveIntegerField("Сборы в США", default=0, help_text="Сумма в $")
@@ -70,9 +73,13 @@ class Movie(models.Model):
     def __str__(self):
         return self.title
 
+    def get_absolute_url(self):
+        return reverse('movie_detail', kwargs={'slug': self.url})
+
     class Meta:
         verbose_name = "Фильм"
         verbose_name_plural = "Фильмы"
+
 
 
 class MovieShoots(models.Model):
