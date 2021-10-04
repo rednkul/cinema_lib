@@ -27,7 +27,7 @@ class DirectorActor(models.Model):
     name = models.CharField("Имя", max_length=30)
     age = models.SmallIntegerField("Возраст", default=0)
     description = models.TextField("Описание")
-    image = models.ImageField("Изображение", upload_to="actors/", blank=True)
+    image = models.ImageField("Файл фотографии", upload_to="actors/", blank=True)
 
     def __str__(self):
         return self.name
@@ -56,7 +56,7 @@ class Movie(models.Model):
     title = models.CharField("Фильм",max_length=50)
     tagline = models.CharField("Слоган",max_length=60, default='')
     description = models.TextField("Описание")
-    poster = models.ImageField("Постер", upload_to='movies/')
+    poster = models.ImageField("Файл постера", upload_to='movies/')
     year = models.DateField("Дата выхода", default=2021)
     country = models.CharField("Страна", max_length=30)
     directors = models.ManyToManyField(DirectorActor, verbose_name="Режиссер", related_name="film_director")
@@ -76,6 +76,9 @@ class Movie(models.Model):
     def get_absolute_url(self):
         return reverse('movie_detail', kwargs={'slug': self.url})
 
+    def get_review(self):
+        return self.reviews_set.filter(parent__isnull=True)
+
     class Meta:
         verbose_name = "Фильм"
         verbose_name_plural = "Фильмы"
@@ -86,7 +89,7 @@ class MovieShoots(models.Model):
     """Кадры из фильма"""
     title = models.CharField("Заголовок", max_length=100)
     description = models.TextField("Описание", max_length=100)
-    image = models.ImageField("Изображение", upload_to="movie_shots/")
+    image = models.ImageField("Файл кадра", upload_to="movie_shots/")
     movie = models.ForeignKey(Movie, verbose_name="Фильм", on_delete=models.CASCADE)
 
     def __str__(self):
@@ -129,14 +132,14 @@ class Rating(models.Model):
 
 
 class Reviews(models.Model):
-    email = models.EmailField
+    email = models.EmailField(default='')
     name = models.CharField("Имя автора", max_length=50)
     text = models.TextField("Сообщение", max_length=5000)
     parent = models.ForeignKey(
             'self', verbose_name="Родитель", on_delete=models.SET_NULL, blank=True, null=True
                                )
     movie = models.ForeignKey(Movie, verbose_name="Фильм", on_delete=models.CASCADE)
-    url = models.SlugField(max_length=160, unique=True)
+
 
     def __str__(self):
         return f"{self.name} - {self.movie}"
