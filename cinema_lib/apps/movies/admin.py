@@ -1,5 +1,9 @@
 from django.contrib import admin
 from django.utils.safestring import mark_safe
+from django import forms
+
+from ckeditor_uploader.widgets import CKEditorUploadingWidget
+
 
 from .models import Category, Genre, Movie, MovieShoots, DirectorActor, Rating, RatingStar, Reviews
 # Register your models here.
@@ -7,6 +11,12 @@ from .models import Category, Genre, Movie, MovieShoots, DirectorActor, Rating, 
 admin.site.site_title = "Администрируй тут"
 admin.site.site_header = "Администрируй тут"
 
+class MoviedminForm(forms.ModelForm):
+    description = forms.CharField(widget=CKEditorUploadingWidget(), label="Описание")
+    class Meta:
+        model = Movie
+        labels = {'description': "Описание"}
+        fields = '__all__'
 
 def get_fields_names(model):
     """Возвращает названия всех полей модели"""
@@ -51,7 +61,8 @@ class MovieAdmin(admin.ModelAdmin):
     save_as = True
     list_editable = ("draft",)
     readonly_fields = ("get_poster",)
-
+    form = MoviedminForm
+    actions = ['published', 'unpublished',]
     fieldsets = (
         (None, {
             "fields": (("title", "tagline"),)
@@ -76,10 +87,29 @@ class MovieAdmin(admin.ModelAdmin):
             "fields": (("url", "draft",),)
         }),
                 )
+
+    def unpublished(self, request, queryset):
+        """Снять с публикации"""
+        row_update = queryset.update(draft=True)
+        message_bit = f"Обновлено записей: {row_update}."
+        self.message_user(request, f"{message_bit}")
+
+    def published(self, request, queryset):
+        """Опубликовать"""
+        row_update = queryset.update(draft=False)
+        message_bit = f"Обновлено записей: {row_update}."
+        self.message_user(request, f"{message_bit}")
+
     def get_poster(self, obj):
         return mark_safe(f'<img src={obj.poster.url} width="100" height="auto">')
 
     get_poster.short_description = ("Постер")
+
+    published.short_description = ("Опубликовать")
+    published.allowed_permissions = ('change',)
+
+    unpublished.short_description = ("Снять с публикации")
+    unpublished.allowed_permissions = ('change',)
 
 
 
