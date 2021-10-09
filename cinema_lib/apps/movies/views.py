@@ -1,11 +1,12 @@
 from django.db.models import Q
+from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.views.generic import ListView, DetailView
 from django.views.generic.base import View
 
 from .models import Movie, Category, DirectorActor, Genre
-from .forms import ReviewForm
+from .forms import ReviewForm, RatingForm
 
 class GenreYear:
     """Жаны и года выхода фильмов"""
@@ -33,11 +34,11 @@ class MovieDetailView(GenreYear, DetailView):
     model = Movie
     slug_field = "url"
 
-    # def get_context_data(self, *args, **kwargs):
-    #     """Получение списка категорий"""
-    #     context = super().get_context_data(*args, **kwargs)
-    #     context['categories'] = Category.objects.all()
-    #     return context
+    def get_context_data(self, **kwargs):
+        """Получение списка категорий"""
+        context = super().get_context_data(**kwargs)
+        context['star_form'] = RatingForm
+        return context
 
     def post(self, request, slug):
         """Отправка формы отзыва"""
@@ -73,7 +74,29 @@ class FilterMoviesView(GenreYear, ListView):
 
         return queryset
 
+class JsonFilterMoviesView(ListView):
+    """Фильтр фильмов json"""
+    def get_queryset(self):
+        get_year = self.request.GET.getlist("year")
+        get_genres = self.request.GET.getlist("genre")
+        if get_year and not get_genres:
+            queryset = Movie.objects.filter(year__in=get_year, draft=False).distinct().values(
+                "title", "tagline", "url", "poster"
+            )
+        elif not get_year and get_genres:
+            queryset = Movie.objects.filter(genres__in=get_genres, draft=False).distinct().values(
+                "title", "tagline", "url", "poster"
+            )
+        else:
+            queryset = Movie.objects.filter(year__in=get_year, genres__in=get_genres, draft=False).distinct().values(
+                "title", "tagline", "url", "poster"
+            )
 
+        return queryset
+
+    def get(self, request, *args, **kwargs):
+        queryset = list(self.get_queryset())
+        return JsonResponse({"movie_list": queryset}, safe=False)
 
 # class AddReview(View):
 #     """Отправка отзывов"""
