@@ -82,7 +82,7 @@ class Movie(models.Model):
     class Meta:
         verbose_name = "Фильм"
         verbose_name_plural = "Фильмы"
-
+        #ordering = ['-id']
 
 
 class MovieShoots(models.Model):
@@ -110,6 +110,7 @@ class RatingStar(models.Model):
     class Meta:
         verbose_name = "Звезда рейтинга"
         verbose_name_plural = "Звезды рейтинга"
+        ordering = ['-value']
 
 
 
