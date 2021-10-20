@@ -12,6 +12,7 @@ class Category(models.Model):
     title = models.CharField("Категория", max_length=30)
     description = models.TextField("Описание")
     url = models.SlugField(max_length=160)
+    image = models.ImageField("Файл постера", upload_to="categories/", blank=True)
 
     def __str__(self):
         return self.title

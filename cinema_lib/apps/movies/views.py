@@ -1,5 +1,5 @@
 from django.core.paginator import Paginator
-from django.db.models import Q
+from django.db.models import Q, Avg
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse
@@ -15,7 +15,9 @@ class GenreYear:
         return Genre.objects.all()
 
     def get_years(self):
-        return Movie.objects.filter(draft=False).values_list("year", flat=True).distinct()
+        #print(sorted(Movie.objects.filter(draft=False).values_list("year", flat=True).distinct()))
+        return sorted(Movie.objects.filter(draft=False).values_list("year", flat=True).distinct())
+
 
 
 class MoviesView(GenreYear, ListView):
@@ -72,6 +74,11 @@ class MovieDetailView(GenreYear, DetailView):
         context = super().get_context_data(**kwargs)
         ip = self.get_client_ip(request)
         movie = Movie.objects.get(url=slug).id
+        avg_rating = Rating.objects.filter(movie=movie).aggregate(Avg('star'))['star__avg']
+        if avg_rating:
+            context['avg_rating'] = avg_rating
+        else:
+            context['avg_rating'] = 'Будьте первым!'
         if Rating.objects.filter(ip=ip, movie=movie).exists():
             context['star'] = int(str(Rating.objects.get(ip=ip, movie=movie).star))
         else:
@@ -100,32 +107,7 @@ class ActorDetailView(GenreYear, DetailView):
     slug_field = 'name'
 
 
-class FilterMoviesView(GenreYear, ListView):
-    """Фильтрация фильмов по году/жанру"""
-    paginate_by = 3
-    paginate_orphans = 1
 
-    def get_queryset(self):
-        get_years = self.request.GET.getlist("year")
-        get_genres = self.request.GET.getlist("genre")
-
-        if get_years and not get_genres:
-            queryset = Movie.objects.filter(year__in=get_years, draft=False)
-        elif not get_years and get_genres:
-            queryset = Movie.objects.filter(genres__in=get_genres, draft=False)
-        else:
-            queryset = Movie.objects.filter(year__in=get_years, genres__in=get_genres, draft=False)
-
-        return queryset
-
-    def get_context_data(self, *args, **kwargs):
-        get_years = self.request.GET.getlist("year")
-        get_genres = self.request.GET.getlist("genre")
-
-        context = super().get_context_data()
-        context['year'] = ''.join([f"year={x}&" for x in get_years])
-        context['genre'] = ''.join([f"genre={x}&" for x in get_genres])
-        return context
 
 
 class JsonFilterMoviesView(ListView):
@@ -174,6 +156,56 @@ class AddStarRating(View):
             print(request.POST.get("movie"))
         return redirect('movies:movie_detail', slug=Movie.objects.get(id=request.POST.get("movie")).url)
 
+
+
+class CategoryListView(ListView, GenreYear):
+    queryset = Category.objects.all()
+
+class FilterMoviesView(GenreYear, ListView):
+    """Фильтрация фильмов по году/жанру"""
+    paginate_by = 3
+    paginate_orphans = 1
+
+    def get_queryset(self):
+        get_years = self.request.GET.getlist("year")
+        get_genres = self.request.GET.getlist("genre")
+
+        if get_years and not get_genres:
+            queryset = Movie.objects.filter(year__in=get_years, draft=False)
+        elif not get_years and get_genres:
+            queryset = Movie.objects.filter(genres__in=get_genres, draft=False)
+        else:
+            queryset = Movie.objects.filter(year__in=get_years, genres__in=get_genres, draft=False)
+
+        return queryset
+
+    def get_context_data(self, *args, **kwargs):
+        get_years = self.request.GET.getlist("year")
+        get_genres = self.request.GET.getlist("genre")
+
+        context = super().get_context_data(*args, **kwargs)
+        context['year'] = ''.join([f"year={x}&" for x in get_years])
+        context['genre'] = ''.join([f"genre={x}&" for x in get_genres])
+        return context
+
+class Search(ListView, GenreYear):
+    """Поиск по названию"""
+    paginate_by = 3
+
+    def get_queryset(self):
+        return Movie.objects.filter(title__iregex=self.request.GET.get('q'))
+
+    # Q(title__contains=self.request.GET.get('q').upper()) |
+    # Q(title__contains=self.request.GET.get('q').lower()))
+
+    def get_context_data(self, *args, **kwargs):
+        search= self.request.GET.get('q')
+
+        context = super().get_context_data(*args, **kwargs)
+        context['q'] = f"q={self.request.GET.get('q')}&"
+        # print(context['q'])
+        # context['search'] = f"search={context['q']}&"
+        return context
 
 
 # class AddReview(View):

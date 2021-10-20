@@ -7,6 +7,8 @@ app_name = 'movies'
 
 urlpatterns = [
     path('', views.MoviesView.as_view(), name='home_page'),
+    path('search/', views.Search.as_view(), name='search'),
+    path('category_list/', views.CategoryListView.as_view(), name = 'category_list'),
     path('movie_filter/', views.FilterMoviesView.as_view(), name='movie_filter'),
     path('add-rating/', views.AddStarRating.as_view(), name='add_rating'),
     path('json-filter/', views.JsonFilterMoviesView.as_view(), name='json_filter'),
