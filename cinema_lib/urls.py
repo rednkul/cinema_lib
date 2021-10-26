@@ -22,8 +22,10 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('movies.urls'), name='home_page'),
     path('ckeditor/', include('ckeditor_uploader.urls')),
+    path('pages/', include('django.contrib.flatpages.urls')),
+    path('', include('movies.urls'), name='home_page'),
+
 ]
 
 if settings.DEBUG:

@@ -1,11 +1,18 @@
 from django import forms
 from .models import Movie, Reviews, Rating, RatingStar
+from snowpenguin.django.recaptcha3.fields import ReCaptchaField
 
 class ReviewForm(forms.ModelForm):
+    captcha = ReCaptchaField()
     """Форма отзывов"""
     class Meta:
         model = Reviews
-        fields = ('email', 'name', 'text')
+        fields = ('email', 'name', 'text', 'captcha')
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control border'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control border'}) ,
+            'text': forms.Textarea(attrs={'class': 'form-control border', "id": "contactcomment"}) ,
+        }
 
 
 class RatingForm(forms.ModelForm):

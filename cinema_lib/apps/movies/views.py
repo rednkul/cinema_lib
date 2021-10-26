@@ -83,6 +83,7 @@ class MovieDetailView(GenreYear, DetailView):
             context['star'] = int(str(Rating.objects.get(ip=ip, movie=movie).star))
         else:
             context['star'] = None
+        context['form'] = ReviewForm
         context['star_form'] = RatingForm
 
         return self.render_to_response(context)
