@@ -11,7 +11,7 @@ from .models import Category, Genre, Movie, MovieShoots, DirectorActor, Rating, 
 admin.site.site_title = "Администрируй тут"
 admin.site.site_header = "Администрируй тут"
 
-class MoviedminForm(forms.ModelForm):
+class MovieAdminForm(forms.ModelForm):
     description = forms.CharField(widget=CKEditorUploadingWidget(), label="Описание")
     class Meta:
         model = Movie
@@ -61,7 +61,7 @@ class MovieAdmin(admin.ModelAdmin):
     save_as = True
     list_editable = ("draft",)
     readonly_fields = ("get_poster",)
-    form = MoviedminForm
+    form = MovieAdminForm
     actions = ['published', 'unpublished',]
     fieldsets = (
         (None, {

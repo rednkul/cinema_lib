@@ -10,7 +10,7 @@ from .models import Movie, Category, DirectorActor, Genre, Rating
 from .forms import ReviewForm, RatingForm
 
 class GenreYear:
-    """Жаны и года выхода фильмов"""
+    """Жанры и года выхода фильмов"""
     def get_genres(self):
         return Genre.objects.all()
 
