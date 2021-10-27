@@ -1,0 +1,40 @@
+{% extends "movies/base.html" %}
+{% block header %} bg1 {% endblock header %}
+{% block content %}
+<div class="left-ads-display col-lg-9">
+    <div class="row">
+        {% for category in category_list %}
+        <div class="col-md-4 product-men">
+            <div class="product-shoe-info editContent text-center mt-lg-4" >
+                <div class="item-info-product">
+                    <h4 class="">
+                        <a href="#" class="editContent" >
+                            {{ category.title }}
+                        </a>
+                    </h4>
+
+                    <div class="product_price">
+                        <div class="grid-price">
+                            <span class="money editContent" >«{{ category.description }}»</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <div class=" mt-4 text-right ">
+            {% include "include/pagination.html" %}
+    </div>
+    <!--<div class="grid-img-right mt-4 text-right bg bg1" >
+        <span class="money editContent" >Flat 50% Off</span>
+        <
+    </div>-->
+</div>
+
+
+<!-- //contact -->
+<!-- footer -->
+
+
+{% endblock content %}

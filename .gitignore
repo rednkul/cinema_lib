@@ -1,3 +1,3 @@
 __pycache__/
 *.sqlite3
-!**/*.html
+!cinema_lib/templates/**/*.html

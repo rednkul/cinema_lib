@@ -29,6 +29,7 @@ def get_image(image):
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
     """Настройка страницы категорий"""
+
     list_display = ("id", "title", "url",)
     list_display_links = ("id", "title", "url",)
 

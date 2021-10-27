@@ -1,15 +1,20 @@
-from django.shortcuts import render
-from django.views.generic import CreateView
-
+from django.shortcuts import render, redirect
+from django.views import View
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
 
 from .models import Contact
 from .forms import ContactForm
 
-class ContactView(CreateView):
+class ContactView(View):
     """Подписка по email"""
-    model = Contact
-    form_class = ContactForm
-    success_url = '/'
-
-
-
+    def post(self, request):
+        email = request.POST.get('email')
+        #print(request.POST)
+        try:
+            validate_email(email)
+        except ValidationError as e:
+            pass
+        else:
+            Contact.objects.update_or_create(email=email)
+        return redirect(request.META.get('HTTP_REFERER'))
