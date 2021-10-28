@@ -4,6 +4,8 @@ from django.urls import reverse
 from datetime import date
 
 
+from django.utils.translation import gettext_lazy as _
+
 
 
 
@@ -20,6 +22,9 @@ class Category(models.Model):
     class Meta:
         verbose_name = "Категория"
         verbose_name_plural = "Категории"
+        # verbose_name_en = "Category"
+        # verbose_name_plural_en = "Categories"
+
 
 
 
@@ -58,7 +63,7 @@ class Movie(models.Model):
     tagline = models.CharField("Слоган",max_length=60, default='')
     description = models.TextField("Описание")
     poster = models.ImageField("Файл постера", upload_to='movies/')
-    year = models.PositiveSmallIntegerField("Годi.tit выхода", default=2021)
+    year = models.PositiveSmallIntegerField("Год выхода", default=2021)
     country = models.CharField("Страна", max_length=30)
     directors = models.ManyToManyField(DirectorActor, verbose_name="Режиссер", related_name="film_director")
     actors = models.ManyToManyField(DirectorActor, verbose_name="Актеры", related_name="film_actor")
@@ -70,6 +75,13 @@ class Movie(models.Model):
     category = models.ForeignKey(Category, verbose_name="Категории", on_delete=models.SET_NULL, null=True)
     url = models.SlugField(max_length=160, unique=True)
     draft = models.BooleanField("Черновик", default=False)
+    titlee = models.CharField(
+        max_length=500,
+        verbose_name=_("TITLE"),
+        help_text=_("HELP_TITLE"),
+        default=''
+    )
+
 
     def __str__(self):
         return self.title

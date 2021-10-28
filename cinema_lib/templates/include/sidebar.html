@@ -1,7 +1,7 @@
-{% load movie_tag %}
+{% load movie_tag i18n %}
 
 <div class="search-bar w3layouts-newsletter">
-    <h3 class="sear-head editContent" >Поиск фильма</h3>
+    <h3 class="sear-head editContent" >{% trans 'Поиск фильма' %}</h3>
     <form action="{% url 'movies:search' %}" method="get" class="d-flex editContent" >
         <input type="search" placeholder="Введите название..." name="q" class="form-control" required="">
         <button type="submit" class="btn1 btn" ><span class="fa fa-search" aria-hidden="true" ></span></button>

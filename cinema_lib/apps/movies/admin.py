@@ -3,7 +3,7 @@ from django.utils.safestring import mark_safe
 from django import forms
 
 from ckeditor_uploader.widgets import CKEditorUploadingWidget
-
+from modeltranslation.admin import TranslationAdmin
 
 from .models import Category, Genre, Movie, MovieShoots, DirectorActor, Rating, RatingStar, Reviews
 # Register your models here.
@@ -12,7 +12,8 @@ admin.site.site_title = "Администрируй тут"
 admin.site.site_header = "Администрируй тут"
 
 class MovieAdminForm(forms.ModelForm):
-    description = forms.CharField(widget=CKEditorUploadingWidget(), label="Описание")
+    description_ru = forms.CharField(widget=CKEditorUploadingWidget(), label="Описание")
+    description_en = forms.CharField(widget=CKEditorUploadingWidget(), label="Description")
     class Meta:
         model = Movie
         labels = {'description': "Описание"}
@@ -27,7 +28,7 @@ def get_image(image):
 
 
 @admin.register(Category)
-class CategoryAdmin(admin.ModelAdmin):
+class CategoryAdmin(TranslationAdmin):
     """Настройка страницы категорий"""
 
     list_display = ("id", "title", "url",)
@@ -51,9 +52,9 @@ class MovieShootsInLine(admin.TabularInline):
     get_image.short_description = ("Изображение")
 
 @admin.register(Movie)
-class MovieAdmin(admin.ModelAdmin):
+class MovieAdmin(TranslationAdmin):
     """Настройка страницы фильмов"""
-    list_display = ("id", "title", "url", "draft", "get_poster")
+    list_display = ("id", "title", "get_poster", "url", "draft")
     list_display_links = ("id", "title", "url",)
     list_filter = ("category", "country")
     search_fields = ("title", "category__title", "actors__name", "directors__name")
@@ -66,7 +67,7 @@ class MovieAdmin(admin.ModelAdmin):
     actions = ['published', 'unpublished',]
     fieldsets = (
         (None, {
-            "fields": (("title", "tagline"),)
+            "fields": (("title", "tagline", 'titlee'),)
         }),
         (None, {
             "fields": (("category", "genres", "country"),)
@@ -126,7 +127,7 @@ class ReviewsAdmin(admin.ModelAdmin):
 
 
 @admin.register(Genre)
-class GenreAdmin(admin.ModelAdmin):
+class GenreAdmin(TranslationAdmin):
     """Настройка страницы жанров"""
     list_display = ("id", "title", "description")
     list_display_links = ("id", "title")
@@ -137,7 +138,7 @@ class GenreAdmin(admin.ModelAdmin):
 
 
 @admin.register(MovieShoots)
-class MovieShootsAdmin(admin.ModelAdmin):
+class MovieShootsAdmin(TranslationAdmin):
     """Настройка страницы кадров из фильма"""
     list_display = ("id", "title", "get_image")
     list_display_links = ("id", "title")
@@ -158,7 +159,7 @@ class MovieShootsAdmin(admin.ModelAdmin):
 
 
 @admin.register(DirectorActor)
-class DirectorActorAdmin(admin.ModelAdmin):
+class DirectorActorAdmin(TranslationAdmin):
     """Настройка страницы актера/режиссера"""
     list_display = ("name", "id", "get_image")
     list_display_links = ("name", "id")

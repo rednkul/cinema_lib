@@ -10,7 +10,7 @@ class ContactView(View):
     """Подписка по email"""
     def post(self, request):
         email = request.POST.get('email')
-        #print(request.POST)
+
         try:
             validate_email(email)
         except ValidationError as e:

@@ -12,6 +12,10 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 import sys
 import os.path
 from pathlib import Path
+from django.utils.translation import ugettext_lazy as _
+
+
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -36,6 +40,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     # Стандартные приложения
+    'modeltranslation',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -57,6 +62,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -119,7 +125,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
-LANGUAGE_CODE = 'ru-ru'
+LANGUAGE_CODE = 'ru'
 
 TIME_ZONE = 'UTC'
 
@@ -220,3 +226,15 @@ RECAPTCHA_PRIVATE_KEY = '6LerNuIcAAAAAM88OZHHLjCRKq1cBygI2hP2t2nT'
 RECAPTCHA_DEFAULT_ACTION = 'generic'
 RECAPTCHA_SCORE_THRESHOLD = 0.5
 SITE_ID = 1
+
+
+# Локализация
+LOCALE_PATHS = (
+    os.path.join(BASE_DIR, 'locale'),
+)
+
+
+LANGUAGES = [
+    ('ru', _('RUSSIAN')),
+    ('en', _('ENGLISH')),
+]
